@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { CTA, PageHero, Reveal, Section } from "@/components/site/primitives";
 import { company, services } from "@/data/site";
-import { submitContact } from "@/actions/contact"; // <-- ADD THIS IMPORT
+import { submitContact } from "@/actions/contact";
 
 const title = "Contact PropAdmin.in | Property Management Enquiry";
 const description =
@@ -53,9 +53,12 @@ const propertyTypeOptions = [
 function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
 
-  // REPLACE THIS FUNCTION
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
+    // ✅ FIX: Prevent double submission
+    if (submitting) return;
+    
     const form = event.currentTarget;
     const raw = Object.fromEntries(new FormData(form).entries());
     const parsed = contactSchema.safeParse(raw);
@@ -68,7 +71,7 @@ function ContactPage() {
     setSubmitting(true);
 
     try {
-      const result = await submitContact(parsed.data); // CALL THE SERVER ACTION
+      const result = await submitContact(parsed.data);
       
       if (!result.success) {
         throw new Error(result.error);
